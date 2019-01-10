@@ -18,4 +18,4 @@ Aware的作用是可以让每个Spring管理的Bean可以获取ApplicationContex
 
 比如通过实现BeanNameAware，Bean可以获取自己Bean的Name。
 
-详细： [Aware](/master/note/applicationContext/aware.md)
+详细： [Aware](/note/applicationContext/aware.md)

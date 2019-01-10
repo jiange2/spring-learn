@@ -6,4 +6,4 @@ Spring的本质就是一个容器，而ApplicationContext就是Spring的容器�
 
 ClassPathApplicationContex继承关系图:
 
-![ClassPathApplicationContex继承关系图](https://raw.githubusercontent.com/jiange2/spring-learn/master/image/ApplicationContext/AbstractApplicationContext.png)
+![ClassPathApplicationContex继承关系图](https://raw.githubusercontent.com/jiange2/spring-learn/master/image/ApplicationContext/ClassPathXmlApplicationContext.png)

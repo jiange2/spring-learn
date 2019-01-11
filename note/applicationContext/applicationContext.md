@@ -11,7 +11,24 @@ ClassPathApplicationContex继承关系图:
 
 ### ApplicationContext 的 Interfaces
 
-### Aware / BeanNameAware
+##### InitializingBean
+
+```java
+public interface InitializingBean {
+	void afterPropertiesSet() throws Exception;
+}
+```
+
+实现了这个接口的Bean，在Spring容器给Bean设置了属性值后会调用这个方法。
+
+在Spring中，还可以通过配置init-method的方式添加初始化方法。和实现InitializingBean这个方式相比，init-method耦合度更低。
+
+```xml
+<bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
+```
+Spring配置同时也支持destroy-method
+
+##### Aware / BeanNameAware
 ```java
 public interface BeanNameAware extends Aware {
 	void setBeanName(String name);
@@ -37,7 +54,7 @@ Aware本身的作用是可以让每个Spring管理的Bean可以获取Application
 
 详细介绍： [Aware](/note/applicationContext/aware.md)
 
-### LifeCycle
+##### LifeCycle
 
 对于容器管理的对象来说，一般都是有生命周期的。比如Servlet就可以通过实现init和destroy方法，来监听容器对象的初始化和销毁。在Spring容器的bean也可以通过LifeCycle实现这样的功能。
 

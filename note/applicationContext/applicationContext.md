@@ -27,7 +27,7 @@ public interface InitializingBean {
 ```xml
 <bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
 ```
-Spring配置同时也支持destroy-method
+Spring配置也支持destroy-method
 
 ##### Aware / BeanNameAware
 ```java
@@ -103,6 +103,12 @@ phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越�
 
 当ApplicationContext调用refresh或start方法的时候，会调用所有LifeCycle bean的start方法。而ApplicationContext调用stop方法的时候就会调用LifeCycle bean的stop方法。
 
-而ApplicationContext是通过LifeCycleProcessor完成实现细节的。
+而ApplicationContext是通过LifeCycleProcessor完成实现的。
 
 详情: [LifeCycleProcessor](/note/applicationContext/LifeCycleProcessor.md)
+
+##### MessageResource
+
+##### ApplicationEventPublisher
+
+Application

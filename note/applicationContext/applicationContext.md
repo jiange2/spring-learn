@@ -11,7 +11,7 @@ ClassPathApplicationContex继承关系图:
 
 ### ApplicationContext 的 Interfaces
 
-###### Aware / BeanNameAware
+### Aware / BeanNameAware
 ```java
 public interface BeanNameAware extends Aware {
 	void setBeanName(String name);
@@ -32,9 +32,8 @@ public void setBeanName(String name) {
 ```
 Aware本身的作用是可以让每个Spring管理的Bean可以获取ApplicationContext或Bean本身的一些信息。
 
-比如通过实现BeanNameAware，Bean可以获取自己Bean的Name。
+比如通过实现了BeanNameAware的，当ApplicationContext加载这个Bean发现他实现了BeanNameAware就会调用setBeanName方法，传入这个Bean的Name。这样,这个Bean可以获取自己的Bean Name。
 
-当ApplicationContext加载这个Bean发现他实现了BeanNameAware就会调用setBeanName方法，传入这个Bean的Name。
 
 详细介绍： [Aware](/note/applicationContext/aware.md)
 
@@ -50,3 +49,42 @@ public interface Lifecycle {
 	boolean isRunning();
 }
 ```
+
+在Spring中还可以通过实现SmartLifeCyle来让ApplicationContext里面的Bean按优先级调用start和stop方法。
+
+SmartLifeCycle:
+
+```java
+public interface SmartLifecycle extends Lifecycle, Phased {
+
+	int DEFAULT_PHASE = Integer.MAX_VALUE;
+
+	default boolean isAutoStartup() {
+		return true;
+	}
+
+	default void stop(Runnable callback) {
+		stop();
+		callback.run();
+	}
+
+	@Override
+	default int getPhase() {
+		return DEFAULT_PHASE;
+	}
+}
+
+public interface Phased {
+	int getPhase();
+}
+```
+
+phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越早启动，越晚关闭。所以默认phase的bean优先级最低。
+
+###### ApplicationContext的LifeCycle和BeanLifeCycle的关系
+
+当ApplicationContext调用refresh或start方法的时候，会调用所有LifeCycle bean的start方法。而ApplicationContext调用stop方法的时候就会调用LifeCycle bean的stop方法。
+
+而ApplicationContext是通过LifeCycleProcessor完成实现细节的。
+
+详情: [LifeCycleProcessor](/note/applicationContext/LifeCycleProcessor.md)

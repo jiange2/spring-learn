@@ -12,7 +12,7 @@ ClassPathApplicationContex继承关系图:
 
 ### ApplicationContext 的 Interfaces
 
-##### InitializingBean
+#### InitializingBean
 
 ```java
 public interface InitializingBean {
@@ -29,7 +29,7 @@ public interface InitializingBean {
 ```
 Spring配置也支持destroy-method
 
-##### Aware / BeanNameAware
+#### Aware / BeanNameAware
 ```java
 public interface BeanNameAware extends Aware {
 	void setBeanName(String name);
@@ -55,7 +55,7 @@ Aware本身的作用是可以让每个Spring管理的Bean可以获取Application
 
 详细介绍： [Aware](/note/applicationContext/aware.md)
 
-##### LifeCycle
+#### LifeCycle
 
 对于容器管理的对象来说，一般都是有生命周期的。比如Servlet就可以通过实现init和destroy方法，来监听容器对象的初始化和销毁。在Spring容器的bean也可以通过LifeCycle实现这样的功能。
 
@@ -99,7 +99,7 @@ public interface Phased {
 
 phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越早启动，越晚关闭。所以默认phase的bean优先级最低。
 
-###### ApplicationContext的LifeCycle实现和LifeCycle Bean的关系
+##### ApplicationContext的LifeCycle实现和LifeCycle Bean的关系
 
 当ApplicationContext调用refresh或start方法的时候，会调用所有LifeCycle bean的start方法。而ApplicationContext调用stop方法的时候就会调用LifeCycle bean的stop方法。
 

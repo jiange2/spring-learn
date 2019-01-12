@@ -126,6 +126,7 @@ public interface ApplicationEventPublisher {
 ```
 
 例子:
+
 事件对象:
 ```java
 public class EmailEvent extends ApplicationEvent {

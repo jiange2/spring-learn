@@ -156,7 +156,7 @@ public void test(){
 ```
 输出结果:
 
-	appContext.publishEvent(new EmailEvent(new Object()));
+	appcontext.eventlistener.EmailEvent[source=java.lang.Object@54e28de4]
 
 需要注意的是，如果我们希望事件是异步进行的，我们需要注入线程池到SimpleApplicationEventMulticaster (事件广播器)。
 

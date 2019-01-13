@@ -104,8 +104,6 @@ public interface Phased {
 
 phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越早启动，越晚关闭。所以默认phase的bean优先级最低。
 
----
-
 ##### ApplicationContext的LifeCycle实现和LifeCycle Bean的关系
 
 当ApplicationContext调用refresh或start方法的时候，会调用所有LifeCycle bean的start方法。而ApplicationContext调用stop方法的时候就会调用LifeCycle bean的stop方法。

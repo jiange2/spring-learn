@@ -11,7 +11,7 @@ ClassPathApplicationContex继承关系图:
 我们通过ClassPathXmlApplicationContext 实现的接口和继承类，来知道ApplicationContext包含了哪些功能，以及分模块的去了解ApplicationContext的实现细节。
 
 ### ApplicationContext 的 Interfaces
-
+---
 #### InitializingBean
 
 ```java
@@ -28,6 +28,8 @@ public interface InitializingBean {
 <bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
 ```
 Spring还可以实现DisposableBean这个接口，监听bean销毁的事件。与之相对Spring配置是destroy-method。
+
+---
 
 #### Aware / BeanNameAware
 ```java
@@ -59,6 +61,8 @@ Aware本身的作用是可以让每个Spring管理的Bean可以获取Application
 #### LifeCycle
 
 对于容器管理的对象来说，一般都是有生命周期的。比如Servlet就可以通过实现init和destroy方法，来监听容器对象的初始化和销毁。在Spring容器的bean也可以通过LifeCycle实现这样的功能。
+
+---
 
 LifeCycle:
 ```java
@@ -100,6 +104,8 @@ public interface Phased {
 
 phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越早启动，越晚关闭。所以默认phase的bean优先级最低。
 
+---
+
 ##### ApplicationContext的LifeCycle实现和LifeCycle Bean的关系
 
 当ApplicationContext调用refresh或start方法的时候，会调用所有LifeCycle bean的start方法。而ApplicationContext调用stop方法的时候就会调用LifeCycle bean的stop方法。
@@ -108,7 +114,11 @@ phase是这个bean的优先级，默认是Integer.MAX_VALUE。phase值越小越�
 
 详情: [LifeCycleProcessor](/note/applicationContext/LifeCycleProcessor.md)
 
+---
+
 ##### MessageResource
+
+---
 
 ##### ApplicationEventPublisher
 
@@ -127,6 +137,8 @@ public interface ApplicationEventPublisher {
 ```
 
 ApplicationEventPublisher更多的一些细节: [ApplicationEventPublisher](/note/applicationContext/ApplicationEventPublisher.md)
+
+---
 
 #### EnvironmentCapable
 
@@ -167,5 +179,7 @@ Enviroment管理了各种属性配置,包括自定义Properties,JVM system prope
 详情: [Properties](/note/applicationContext/Env-Properties.md)
 
 Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#beans-environment)
+
+---
 
 ### ResourceLoader

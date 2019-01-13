@@ -27,7 +27,7 @@ public interface InitializingBean {
 ```xml
 <bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
 ```
-Spring配置也支持destroy-method
+Spring还可以实现DisposableBean这个接口，监听bean销毁的事件。与之相对Spring配置是destroy-method。
 
 #### Aware / BeanNameAware
 ```java
@@ -52,6 +52,7 @@ Aware本身的作用是可以让每个Spring管理的Bean可以获取Application
 
 比如通过实现了BeanNameAware的，当ApplicationContext加载这个Bean发现他实现了BeanNameAware就会调用setBeanName方法，传入这个Bean的Name。这样,这个Bean可以获取自己的Bean Name。
 
+但是这种方式并不是很推荐，因为这样会和Spring耦合在一起。如果需要Aware的信息可以通过@Autowire的方式替代。
 
 详细介绍： [Aware](/note/applicationContext/aware.md)
 
@@ -126,3 +127,43 @@ public interface ApplicationEventPublisher {
 ```
 
 ApplicationEventPublisher更多的一些细节: [ApplicationEventPublisher](/note/applicationContext/ApplicationEventPublisher.md)
+
+#### EnvironmentCapable
+
+```java
+public interface EnvironmentCapable {
+
+	Environment getEnvironment();
+
+}
+```
+Environment主要是两个方面的封装Profiles和Properties的抽象。
+而ApplicationContext实现了EnvironmentCapable这个接口，在ApplicationContext初始化的会创建一个StandardEnviroment。
+
+###### Profile
+Profile可以理解为容器的分组。ApplicationContext会根据Environment当前处于active状态的Profile来决定加载哪些bean。
+
+```xml
+<!-- 当Environment active的Prifile为Test时,读取test目录的property -->
+<beans profile="test">
+    <context:property-placeholder
+            location="classpath*:test/*.properties" />
+</beans>
+
+<!-- 当Environment active的Prifile为Production,读取production目录的property -->
+<beans profile="production">
+    <context:property-placeholder
+            location="classpath*:production/*.properties" />
+</beans>
+```
+
+详情: [Profile](/note/applicationContext/env-profile.md)
+
+###### properties
+Enviroment管理了各种属性配置,包括自定义Properties,JVM system properties,system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Map objects, 等等.
+
+通过Enviroment，我们可以通过统一接口可以访问各种Properties。
+
+详情: [Properties](/note/applicationContext/env-properties.md)
+
+Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#beans-environment)

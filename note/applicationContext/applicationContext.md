@@ -157,13 +157,15 @@ Profile可以理解为容器的分组。ApplicationContext会根据Environment�
 </beans>
 ```
 
-详情: [Profile](/note/applicationContext/env-profile.md)
+详情: [Profile](/note/applicationContext/Env-Profile.md)
 
-###### properties
+###### Properties
 Enviroment管理了各种属性配置,包括自定义Properties,JVM system properties,system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Map objects, 等等.
 
 通过Enviroment，我们可以通过统一接口可以访问各种Properties。
 
-详情: [Properties](/note/applicationContext/env-properties.md)
+详情: [Properties](/note/applicationContext/Env-Properties.md)
 
 Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#beans-environment)
+
+### ResourceLoader

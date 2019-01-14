@@ -1,6 +1,6 @@
 ## Application Context简介
 
-Spring的本质就是一个容器，而ApplicationContext就是Spring的容器。
+Spring的最核心的部分就是容器，而ApplicationContext就是Spring的容器。
 
 以ClassPathApplicationContext为例来分析 ApplicationContext.
 

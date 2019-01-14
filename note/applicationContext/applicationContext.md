@@ -181,3 +181,5 @@ Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spri
 ---
 
 ### ResourceLoader
+
+Resource是Spring对资源的封装，比如本地文件，网络文件。

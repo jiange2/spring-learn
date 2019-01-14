@@ -79,7 +79,7 @@ Aware本身的作用是可以让每个Spring管理的Bean可以获取Application
 
 但是这种方式并不是很推荐，因为这样会和Spring耦合在一起。如果需要Aware的信息可以通过@Autowire的方式替代。
 
-详细介绍： [Aware](/note/applicationContext/aware.md)
+详细介绍： [Aware](/note/applicationContext/Aware.md)
 
 ---
 

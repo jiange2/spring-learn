@@ -150,7 +150,7 @@ public interface EnvironmentCapable {
 Environment主要是两个方面的封装Profiles和Properties的抽象。
 而ApplicationContext实现了EnvironmentCapable这个接口，在ApplicationContext初始化的会创建一个StandardEnviroment。
 
-###### Profile
+##### Profile
 Profile可以理解为容器的分组。ApplicationContext会根据Environment当前处于active状态的Profile来决定加载哪些bean。
 
 ```xml
@@ -169,7 +169,7 @@ Profile可以理解为容器的分组。ApplicationContext会根据Environment�
 
 详情: [Profile](/note/applicationContext/Env-Profile.md)
 
-###### Properties
+##### Properties
 Enviroment管理了各种属性配置,包括自定义Properties,JVM system properties,system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Map objects, 等等.
 
 通过Enviroment，我们可以通过统一接口可以访问各种Properties。
@@ -180,6 +180,26 @@ Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spri
 
 ---
 
-### ResourceLoader
+### Resource和ResourceLoader
 
-Resource是Spring对资源的封装，比如本地文件，网络文件。
+##### Rsource
+Resource是Spring对各种资源文件的封装，通过Resource进行对资源统一的访问。
+
+为什么Spring要对资源进行封装？
+
+>Spring官方文档：
+>
+>Java’s standard java.net.URL class and standard handlers for various URL prefixes, unfortunately, are not quite adequate enough for all access to low-level resources. For example, there is no standardized URL implementation that may be used to access a resource that needs to be obtained from the classpath or relative to a ServletContext. While it is possible to register new handlers for specialized URL prefixes (similar to existing handlers for prefixes such as http:), this is generally quite complicated, and the URL interface still lacks some desirable functionality, such as a method to check for the existence of the resource being pointed to.
+
+总的来说就是java标准库的java.net.URL类,虽然对不同协议头的资源做了统一封装。但是在易用性和完整性，spring并不是很满意，所以就做了这样一个封装。
+
+例外这段文字中提到了一个点值得我们思考:
+
+**URL没有classpath和servletContext资源这两种协议**。所以其实classpath这个我们十分常用的路径头，可以理解为在Spring里面的一种特殊文件传输协议。在Spring中classpath和我们常用的http,ftp,file等协议头没什么区别，都是文件获取的协议。
+
+##### ResourceLoader
+
+ApplicationContext 实现了 ResourceLoader 这个接口。通过这个接口的方法，我们可以传入不同文件协议的路径来获取资源文件。
+
+详情: [Resource和ResourceLoader](/note/appplicationContext/Resource和ResourceLoader.md)
+

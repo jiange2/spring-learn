@@ -202,3 +202,4 @@ Resource是Spring对各种资源文件的封装，通过Resource进行对资源�
 ApplicationContext 实现了 ResourceLoader 这个接口。通过这个接口的方法，我们可以传入不同文件协议的路径来获取资源文件。
 
 详情: [Resource和ResourceLoader](/note/appplicationContext/Resource和ResourceLoader.md)
+

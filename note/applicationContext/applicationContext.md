@@ -150,7 +150,7 @@ public interface EnvironmentCapable {
 Environment主要是两个方面的封装Profiles和Properties的抽象。
 而ApplicationContext实现了EnvironmentCapable这个接口，在ApplicationContext初始化的会创建一个StandardEnviroment。
 
-###### Profile
+##### Profile
 Profile可以理解为容器的分组。ApplicationContext会根据Environment当前处于active状态的Profile来决定加载哪些bean。
 
 ```xml
@@ -169,7 +169,7 @@ Profile可以理解为容器的分组。ApplicationContext会根据Environment�
 
 详情: [Profile](/note/applicationContext/Env-Profile.md)
 
-###### Properties
+##### Properties
 Enviroment管理了各种属性配置,包括自定义Properties,JVM system properties,system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Map objects, 等等.
 
 通过Enviroment，我们可以通过统一接口可以访问各种Properties。
@@ -182,7 +182,7 @@ Spring官方文档: [Spring Environment Abstraction](https://docs.spring.io/spri
 
 ### Resource和ResourceLoader
 
-###### Rsource
+##### Rsource
 Resource是Spring对各种资源文件的封装，通过Resource进行对资源统一的访问。
 
 为什么Spring要对资源进行封装？

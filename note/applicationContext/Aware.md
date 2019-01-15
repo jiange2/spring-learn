@@ -2,8 +2,6 @@
 
 #### Aware Interface
 
-Spring还提供了
-
 Aware Interfaces:
 
 | Name | Injected Dependency |

@@ -8,7 +8,7 @@ ClassPathApplicationContex继承关系图:
 
 ![ClassPathApplicationContex继承关系图](/image/ApplicationContext/ClassPathXmlApplicationContext.png)
 
-我们通过ClassPathXmlApplicationContext 实现的接口和继承类，来知道ApplicationContext包含了哪些功能，以及分模块的去了解ApplicationContext的实现细节。
+我们可以发现一个ApplicationContext实现和继承了很多接口和抽象类。通过这些接口和继承类，来知道ApplicationContext包含了哪些功能，以及分模块的去了解ApplicationContext的实现细节。
 
 ### ApplicationContext 的 Interfaces
 ---
@@ -20,14 +20,37 @@ public interface InitializingBean {
 }
 ```
 
-实现了这个接口的Bean，在Spring容器给Bean设置了属性值后会调用这个方法。
+实现了这个接口的Bean，在Spring容器给Bean设置了属性值后会调用这个方法。相对应的Spring中还有DisposableBean这个接口，实现了这个接口的bean，applicationContext会在销毁这个bean时调用这个接口的destroy方法。
 
-在Spring中，还可以通过配置init-method的方式添加初始化方法。和实现InitializingBean这个方式相比，init-method耦合度更低。
+Spring并不推荐实现这个两个接口，因为这样会将代码会和Spring耦合。
+> We recommend that you do not use the InitializingBean interface, because it unnecessarily couples the code to Spring.
 
+如果需要实现init和destroy这样的功能。可以通过xml配置或者使用`@PostConstruct`和`@PreDestroy`注解 (这两个注解是java标准库的注解，而不是spring的)。
+
+xml配置:
 ```xml
-<bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
+<beans default-init-method="init">
+	<bean class="com.test.InitBean" init-method="init" destroy-method="destroy"/>
+</beans>
+
+在beans可以设置default-init-method，也就是设置beans下面的bean的默认初始化方法。
 ```
-Spring还可以实现DisposableBean这个接口，监听bean销毁的事件。与之相对Spring配置是destroy-method。
+注解方式：
+```java
+@Component
+public class InitBean {
+
+    @PostConstruct
+    public void init(){
+        System.out.println("@PostConstruct init");
+    }
+
+    @PreDestroy
+    public void destroy(){
+        System.out.println("@PreDestroy destroy");
+    }
+}
+```
 
 ---
 
@@ -202,3 +225,11 @@ Resource是Spring对各种资源文件的封装，通过Resource进行对资源�
 ApplicationContext 实现了 ResourceLoader 这个接口。通过这个接口的方法，我们可以传入不同文件协议的路径来获取资源文件。
 
 详情: [Resource和ResourceLoader](/note/appplicationContext/Resource和ResourceLoader.md)
+
+#### BeanFactory
+
+ApplicationContext最核心的功能就是管理bean，说白了ApplicationContext就是一个BeanFactroy，其他接口实现都是为BeanFactory服务的。
+
+BeanFactory提供了ApplicationContext最核心的功能。
+
+BeanFactory详情: [BeanFactory](/applicationContext/BeanFactory.md)

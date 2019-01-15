@@ -1,0 +1,3 @@
+## LifeCycleProcessor
+
+ApplicationContext通过调用LifeCycleProcessor实现调用LifeCycle Bean的生命周期回调。

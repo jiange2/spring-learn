@@ -18,9 +18,4 @@ Aware Interfaces:
 |ServletConfigAware|Current ServletConfig the container runs in. Valid only in a web-aware Spring ApplicationContext.|
 |ServletContextAware| Current ServletContext the container runs in. Valid only in a web-aware Spring ApplicationContext. |
 
-但是Spring建议尽量避免使用这些接口，因为这样会使代码和Spring耦合。如果在bean中需要使用ApplicationContext这种对象可以使用`@Autowired`这个注解。
-
-```java
-@Autowired
-private ApplicationContext applicationContext;
-```
+#### BeanPostProcessor

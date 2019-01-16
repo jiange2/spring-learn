@@ -44,4 +44,46 @@ LifeCycleProcessor必须设置beahFactory，因为LifeCycleProcessor实际上管
 #### Start和OnRefresh
 
 ```java
+@Override
+public void start() {
+	startBeans(false);
+	this.running = true;
+}
+
+@Override
+public void onRefresh() {
+	startBeans(true);
+	this.running = true;
+}
+
+private void startBeans(boolean autoStartupOnly) {
+	Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
+	Map<Integer, LifecycleGroup> phases = new HashMap<>();
+  // 分组
+	lifecycleBeans.forEach((beanName, bean) -> {
+		if (!autoStartupOnly || (bean instanceof SmartLifecycle && ((SmartLifecycle) bean).isAutoStartup())) {
+			int phase = getPhase(bean);
+			LifecycleGroup group = phases.get(phase);
+			if (group == null) {
+				group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
+				phases.put(phase, group);
+			}
+			group.add(beanName, bean);
+		}
+	});
+  // 分组排序启动
+	if (!phases.isEmpty()) {
+		List<Integer> keys = new ArrayList<>(phases.keySet());
+		Collections.sort(keys);
+		for (Integer key : keys) {
+			phases.get(key).start();
+		}
+	}
+}
+
+protected int getPhase(Lifecycle bean) {
+	return (bean instanceof Phased ? ((Phased) bean).getPhase() : 0);
+}
 ```
+
+ApplicationContext启动的时候会调用onRefresh方法，但不会调用start方法。OnRefresh调用startBeans，autoStartupOnly为true，这个时候只会调用autoStartupOnly为true的SmartLifeCycle Bean。所以要显式调用applicationContext的start方法才能启动普通的LifeCycle Bean。

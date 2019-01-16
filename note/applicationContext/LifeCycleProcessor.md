@@ -95,7 +95,7 @@ ApplicationContext启动的时候会调用onRefresh方法，但不会调用start
 group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
 ```
 
-对于SmartLifeCycle Bean，前面提到SmartLifeCycle的stop回调机制来实现异步stop的。applicationContext中有会有阻塞机制等待bean stop完成，但是applicationContext不会一直等待会有超时机制，超过了时间就会直接结束。
+对于SmartLifeCycle Bean，前面提到SmartLifeCycle的stop回调机制来实现异步stop的。applicationContext中有会有阻塞机制等待bean stop完成，但是applicationContext有超时机制，超过了时间就会直接结束。
 
 stop:
 ```java

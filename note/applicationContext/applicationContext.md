@@ -237,6 +237,8 @@ Resource是Spring对各种资源文件的封装，通过Resource进行对资源�
 
 **URL没有classpath和servletContext资源这两种协议**。所以其实classpath这个我们十分常用的路径头，可以理解为在Spring里面的一种特殊文件传输协议。在Spring中classpath和我们常用的http,ftp,file等协议头没什么区别，都是文件获取的协议。
 
+>For example, there is no standardized URL implementation that may be used to access a resource that needs to be obtained from the classpath or relative to a ServletContext.
+
 ##### ResourceLoader
 
 ApplicationContext 实现了 ResourceLoader 这个接口。通过这个接口的方法，我们可以传入不同文件协议的路径来获取资源文件。

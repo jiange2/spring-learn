@@ -87,3 +87,49 @@ protected int getPhase(Lifecycle bean) {
 ```
 
 ApplicationContext启动的时候会调用onRefresh方法，但不会调用start方法。OnRefresh调用startBeans，autoStartupOnly为true，这个时候只会调用autoStartupOnly为true的SmartLifeCycle Bean。所以要显式调用applicationContext的start方法才能启动普通的LifeCycle Bean。
+
+###### 分组stop
+
+分组创建:
+```java
+group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
+```
+
+对于SmartLifeCycle Bean，前面提到SmartLifeCycle的stop回调机制来实现异步stop的。applicationContext中有会有阻塞机制等待bean stop完成，但是applicationContext不会一直等待会有超时机制，超过了时间就会直接结束。
+
+stop:
+```java
+public void stop() {
+	if (this.members.isEmpty()) {
+		return;
+	}
+	if (logger.isDebugEnabled()) {
+		logger.debug("Stopping beans in phase " + this.phase);
+	}
+	this.members.sort(Collections.reverseOrder());
+	CountDownLatch latch = new CountDownLatch(this.smartMemberCount);
+	Set<String> countDownBeanNames = Collections.synchronizedSet(new LinkedHashSet<>());
+	Set<String> lifecycleBeanNames = new HashSet<>(this.lifecycleBeans.keySet());
+	for (LifecycleGroupMember member : this.members) {
+		if (lifecycleBeanNames.contains(member.name)) {
+			doStop(this.lifecycleBeans, member.name, latch, countDownBeanNames);
+		}
+		else if (member.bean instanceof SmartLifecycle) {
+			latch.countDown();
+		}
+	}
+	try {
+		latch.await(this.timeout, TimeUnit.MILLISECONDS);
+		if (latch.getCount() > 0 && !countDownBeanNames.isEmpty() && logger.isInfoEnabled()) {
+			logger.info("Failed to shut down " + countDownBeanNames.size() + " bean" +
+					(countDownBeanNames.size() > 1 ? "s" : "") + " with phase value " +
+					this.phase + " within timeout of " + this.timeout + ": " + countDownBeanNames);
+		}
+	}
+	catch (InterruptedException ex) {
+		Thread.currentThread().interrupt();
+	}
+}
+```
+
+代码是通过concurrent包的CountDownLatch来完成超时功能的。latch的初始值为分组bean的数量，每一个LifeCycle调用stop方法的callback，latch的值都会-1。`latch.await(this.timeout, TimeUnit.MILLISECONDS);`这句代码会阻塞，直到超时或者latch的值为0。

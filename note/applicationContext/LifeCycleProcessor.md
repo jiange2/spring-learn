@@ -132,4 +132,4 @@ public void stop() {
 }
 ```
 
-代码是通过concurrent包的CountDownLatch来完成超时功能的。latch的初始值为分组bean的数量，每一个LifeCycle调用stop方法的callback，latch的值都会-1。`latch.await(this.timeout, TimeUnit.MILLISECONDS);`这句代码会阻塞，直到超时或者latch的值为0。
+代码是通过concurrent包的CountDownLatch来完成超时中断功能的。CountDownLatch的初始值为分组bean的数量，每一个LifeCycle调用stop方法的callback，latch的值都会-1。`latch.await(this.timeout, TimeUnit.MILLISECONDS);`这句代码会阻塞，直到超时或者latch的值为0。

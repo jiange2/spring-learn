@@ -8,7 +8,7 @@ ClassPathApplicationContex继承关系图:
 
 ![ClassPathApplicationContex继承关系图](/image/ApplicationContext/ClassPathXmlApplicationContext.png)
 
-我们可以发现一个ApplicationContext实现和继承了很多接口和抽象类。通过这些接口和继承类，来知道ApplicationContext包含了哪些功能，以及分模块的去了解ApplicationContext的实现细节。
+我们可以发现一个ApplicationContext实现和继承了很多接口和抽象类。通过这些接口和抽象类，来知道ApplicationContext包含了哪些功能，以及分模块的去了解ApplicationContext的实现细节。
 
 ### ApplicationContext 的 Interfaces
 ---
@@ -154,7 +154,44 @@ LifeCycleProcessor: [LifeCycleProcessor](/note/applicationContext/LifeCycleProce
 
 ---
 
-##### MessageResource
+##### MessageSource
+
+ApplicationContext 实现了 MessageSource 这个接口来提供 I18N 功能。
+
+MessageSource有以下三个常用方法。
+
+`String getMessage(String code, Object[] args, String default, Locale loc)`
+
+`String getMessage(String code, Object[] args, Locale loc)`
+
+`String getMessage(MessageSourceResolvable resolvable, Locale locale)`
+
+code是Property的key值。
+args是因为Property的value支持占位符（Hello {0}），我们还可以设置default值以及loc。
+如果不是设置default值的话，当key值找不到会抛`NoSuchMessageException`。
+
+使用MessageResource必须配置 `messageSource` （bean id必须是这个值）。Spring会查找messageSource这个bean来实现I18N功能，如果不配置的话spring会使用`DelegatingMessageSource`这个不包含任何properties的MessageSource。
+
+##### 配置MessageResource。
+
+spring提供了ResourceBundleMessageSource和StaticMessageSource这两个实现。
+
+```xml
+<beans>
+    <bean id="messageSource"
+            class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>format</value>
+                <value>exceptions</value>
+                <value>windows</value>
+            </list>
+        </property>
+    </bean>
+</beans>
+```
+
+ResourceBundleMessageSource是基于
 
 ---
 

@@ -87,7 +87,26 @@ parent-value
 ```
 #### Common Message
 
+AbstractMessage定义了commonMessage用来存放区域无关的消息。
+
+```java
+<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="commonMessages">
+        <map>
+            <entry key="common-key" value="common-value"/>
+        </map>
+    </property>
+    <property name="basename" value="message-source"/>
+</bean>
+```
+
 #### MessageFormat
+
+MessageSource支持带占位符的Property。例如: `{0} World`，调用的时候加上参数
+`System.out.println(appContext.getMessage("key2",new Object[]{"Hello"}, Locale.CHINA));`
+。就可以把`{0}`替换成 `Hello`
+
+AbstractMessage定义了useCodeAsDefaultMessage
 
 #### MessageSourceResolvable
 

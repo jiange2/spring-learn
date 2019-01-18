@@ -22,6 +22,19 @@ key=value
 
 `<property name="basename" value="message-source"/>`这里的basename指的是properties文件的根路径。
 
+测试代码:
+```Java
+@Test
+public void test(){
+    ClassPathXmlApplicationContext appContext =
+            new ClassPathXmlApplicationContext("classpath:app-context.xml");
+    System.out.println(appContext.getMessage("key",null, Locale.getDefault()));
+}
+```
+控制台:
+
+    value
+
 #### 父MessageSource
 
 Spring有两种MessageSource的实现,ResourceBundleMessageSource和StaticMessageSource。这两种实现都继承了HierarchicalMessageSource。

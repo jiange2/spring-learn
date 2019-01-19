@@ -175,13 +175,15 @@ public void test(){
 ```
 `args`是MessageSourceResolvable的占位符参数。而MessageSourceResolvable的结果（`[value args]`）又是getMessage的占位符参数，形成嵌套的效果。
 
-#### 参数配置
+---
 
-###### AbstractMessageSource
+#### 参数配置 (待续)
+
+###### MessageSourceSupport
 
 **alwaysUseMessageFormat (false)**:
 
-
+如果配置为true，即使没有传入参数也会使用MessageFormat。
 
 ###### AbstractMessageSource
 
@@ -192,7 +194,7 @@ public void test(){
 useCodeAsDefaultMessage = true --> 把key值当成value
 useCodeAsDefaultMessage = false --> 抛出异常
 
-
+---
 
 #### 源码分析
 
@@ -288,9 +290,15 @@ protected String getMessageInternal(@Nullable String code, @Nullable Object[] ar
 在`alwaysUseMessageFormat`（可配置）为false以及没有传入参数的情况下，尝试调用`resolveCodeWithoutArguments`（子类需要实现的方法）获取结果。
 
 传入了参数：
-先通过调用`resolveArguments(args, locale);`把[MessageSourceResolvable](#MessageSourceResolvable)解析,然后尝试调用`resolveCode`（子类需要实现的方法）获取结果。
+先通过调用`resolveArguments(args, locale);`把[MessageSourceResolvable](#MessageSourceResolvable)解析成字符串,然后尝试调用`resolveCode`（子类需要实现的方法）获取结果。
 
 如果经过上面的步骤还拿不到参数的话就可以尝试通过配置common message获取结果。还没有就尝试父MessageSource。
 
 总结优先级:
 `resolveCode|resolveCodeWithoutArguments` > `commonMessages` > `getMessageFromParent` > `defaultMessage` > `getDefaultMessag(key)` > `exception`
+
+---
+
+## SpringMessageSource的实现 （待续）
+
+#### ResourceBundleMessageSource

@@ -62,4 +62,6 @@ public void test(){
 </bean>
 ```
 
-注意: bean的id必须配置为applicationEventMulticaster。因为Spring有很多这样的HardCode,根据bean的id和class来找需要的bean。
+注意: bean的id必须配置为applicationEventMulticaster（Spring有很多这样的HardCode）。
+
+#### 源码分析 （待续）

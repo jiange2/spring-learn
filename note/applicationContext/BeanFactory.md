@@ -146,6 +146,22 @@ public boolean hasAlias(String name, String alias) {
 }
 ```
 
+我们可以发现hasAlias的参数是name、alias，而checkForAliasCircle调用hasAlias的时候传的是alias、name，把两个参数调换着传。我们在看hasAlias的源码之前，可以简单推断，如果hasAlias的结果是true的话,其实就是说已经存在了name -> alias的情况，如果我们再注册一个 alias -> name ，那就出现了循环的情况，这个时候会抛出异常，也就是alias循环是不被允许的。
+
+** alias传递映射: **
+
+`registeredAlias.equals(alias) || hasAlias(registeredAlias, alias)` 通过这句, hasAlias除了 alias 直接指向 name 的情况(`registeredAlias.equals(alias)`)。还有间接指向的情况(`hasAlias(registeredAlias, alias)`)
+
+举个例子：
+
+假如hasAlias的参数是 name:C, alias:A
+
+那假如注册过 A -> C, 那返回结果肯定是true。
+
+而对于另外一种传递引用的也会是true。 比如注册过： A -> B,B -> C。代码首先找到了C的直接alias B,但是发现B并不等于A，那就会递归去找B的Alias有没有A。这个时候就可以找到A，那结果就是true。
+
+所以对于前面判断循环就不只有直接的互相指向才算是循环(A->B,B->A)，间接互相指向也算是循环(A->B,B->C,C->A)。
+
 
 **BeanDefinitionRegistry: **
 

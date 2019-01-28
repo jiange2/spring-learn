@@ -20,7 +20,7 @@ ApplicationContext将很多不同的组件(LifeCycleProcessor,ResourceLoader,Mes
 
 ### 2、BeanFactory基础概念介绍
 
-**Name和Aliase :**
+** Name和Aliase :**
 
 Spring一般可以通过BeanName和Bean的type来获取bean。那Bean的Name是根据我们配置决定的，主要是跟id和name这两个属性有关系。name的逻辑：
  - 假如配置了id，BeanName就是id。
@@ -31,11 +31,11 @@ Spring一般可以通过BeanName和Bean的type来获取bean。那Bean的Name是�
 
 无论是BeanName或是Aliase都可以通过getBean(String name)的方式来获取bean。
 
-**BeanDefinition :**
+** BeanDefinition :**
 
 
 
-**BeanProvider :**
+** BeanProvider :**
 
 这是4.3之后的新特性，主要是提供了获取bean的其他方式，以及解决byType查找时，非唯一的情况。
 
@@ -55,7 +55,7 @@ Spring一般可以通过BeanName和Bean的type来获取bean。那Bean的Name是�
 
 ### 4、Alias注册和获取
 
-**AliasRegistry: **
+** AliasRegistry: **
 
 ```java
 
@@ -75,7 +75,7 @@ public interface AliasRegistry {
 
 AliasRegistry提供了管理访问别名的方法。
 
-**register alias: **
+** register alias: **
 
 ```Java
 public void registerAlias(String name, String alias) {
@@ -261,8 +261,6 @@ public void resolveAliases(StringValueResolver valueResolver) {
 
 ### 5、BeanDefinition注册和获取
 
-**BeanDefinitionRegistry: **
-
 ```Java
 public interface BeanDefinitionRegistry extends AliasRegistry {
 
@@ -282,227 +280,105 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	boolean isBeanNameInUse(String beanName);
 
 }
+
 ```
 
-BeanDefinitionRegistry提供了BeanDefinination的管理和访问方法。
+- BeanDefinitionRegistry提供了BeanDefinination的管理和访问方法。
 
-BeanDefinitionRegistry继承了AliasRegistry,因为Alias其实也是BeanDefinition的一个特性。
+- BeanDefinitionRegistry继承了AliasRegistry,因为Alias其实也是BeanDefinition的一个特性。
 
+** 注册BeanDefinition: **
 
-
----
-
-### 3、BeanFactory接口
-
-在阅读BeanFactory源码之前，我们先看一下BeanFactory提供了些什么功能。
-
-```java
-public interface BeanFactory {
-
-	// BeanName 为&打头的Bean就是FactoryBan
-	String FACTORY_BEAN_PREFIX = "&";
-
-	Object getBean(String name) throws BeansException;
-
-	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
-
-	Object getBean(String name, Object... args) throws BeansException;
-
-	<T> T getBean(Class<T> requiredType) throws BeansException;
-
-	<T> T getBean(Class<T> requiredType, Object... args) throws BeansException;
-
-	<T> ObjectProvider<T> getBeanProvider(Class<T> requiredType);
-
-	<T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType);
-
-	boolean containsBean(String name);
-
-	boolean isSingleton(String name) throws NoSuchBeanDefinitionException;
-
-	boolean isPrototype(String name) throws NoSuchBeanDefinitionException;
-
-	boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException;
-
-	boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException;
-
-	Class<?> getType(String name) throws NoSuchBeanDefinitionException;
-
-	String[] getAliases(String name);
-
-}
-```
-
-可以看到大致是一些获取Bean和判断Bean的各种属性。先简单介绍这里面的一些概念：
-
-
-
-### 4、BeanFactory源码
-
-##### getBean by name：
+DefaultListableBeanFactory的registerBeanDefinition实现：
 
 ```java
 @Override
-public Object getBean(String name) throws BeansException {
-	return doGetBean(name, null, null, false);
-}
+public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+		throws BeanDefinitionStoreException {
 
-protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
-		@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
+  Assert.hasText(beanName, "Bean name must not be empty");
+  Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
-	final String beanName = transformedBeanName(name);
-	Object bean;
+  //校验BeanDefinition
+  if (beanDefinition instanceof AbstractBeanDefinition) {
+  	try {
+  		((AbstractBeanDefinition) beanDefinition).validate();
+  	}
+  	catch (BeanDefinitionValidationException ex) {
+  		throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
+  				"Validation of bean definition failed", ex);
+  	}
+  }
 
-	// Eagerly check singleton cache for manually registered singletons.
-	Object sharedInstance = getSingleton(beanName);
-	if (sharedInstance != null && args == null) {
-		if (logger.isTraceEnabled()) {
-			if (isSingletonCurrentlyInCreation(beanName)) {
-				logger.trace("Returning eagerly cached instance of singleton bean '" + beanName +
-						"' that is not fully initialized yet - a consequence of a circular reference");
-			}
-			else {
-				logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
+	BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+  //该BeanName是否已经注册过BeanDefinition了
+	if (existingDefinition != null) {
+    //不允许覆盖
+		if (!isAllowBeanDefinitionOverriding()) {
+			throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
+		}
+    //情况1的log
+		else if (existingDefinition.getRole() < beanDefinition.getRole()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Overriding user-defined bean definition for bean '" + beanName +
+						"' with a framework-generated bean definition: replacing [" +
+						existingDefinition + "] with [" + beanDefinition + "]");
 			}
 		}
-		bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
-	}
-
-	else {
-		// Fail if we're already creating this bean instance:
-		// We're assumably within a circular reference.
-		if (isPrototypeCurrentlyInCreation(beanName)) {
-			throw new BeanCurrentlyInCreationException(beanName);
-		}
-
-		// Check if bean definition exists in this factory.
-		BeanFactory parentBeanFactory = getParentBeanFactory();
-		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
-			// Not found -> check parent.
-			String nameToLookup = originalBeanName(name);
-			if (parentBeanFactory instanceof AbstractBeanFactory) {
-				return ((AbstractBeanFactory) parentBeanFactory).doGetBean(
-						nameToLookup, requiredType, args, typeCheckOnly);
-			}
-			else if (args != null) {
-				// Delegation to parent with explicit args.
-				return (T) parentBeanFactory.getBean(nameToLookup, args);
-			}
-			else if (requiredType != null) {
-				// No args -> delegate to standard getBean method.
-				return parentBeanFactory.getBean(nameToLookup, requiredType);
-			}
-			else {
-				return (T) parentBeanFactory.getBean(nameToLookup);
+    //情况2的log
+		else if (!beanDefinition.equals(existingDefinition)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Overriding bean definition for bean '" + beanName +
+						"' with a different definition: replacing [" + existingDefinition +
+						"] with [" + beanDefinition + "]");
 			}
 		}
-
-		if (!typeCheckOnly) {
-			markBeanAsCreated(beanName);
-		}
-
-		try {
-			final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-			checkMergedBeanDefinition(mbd, beanName, args);
-
-			// Guarantee initialization of beans that the current bean depends on.
-			String[] dependsOn = mbd.getDependsOn();
-			if (dependsOn != null) {
-				for (String dep : dependsOn) {
-					if (isDependent(beanName, dep)) {
-						throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-								"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
-					}
-					registerDependentBean(dep, beanName);
-					try {
-						getBean(dep);
-					}
-					catch (NoSuchBeanDefinitionException ex) {
-						throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-								"'" + beanName + "' depends on missing bean '" + dep + "'", ex);
-					}
-				}
-			}
-
-			// Create bean instance.
-			if (mbd.isSingleton()) {
-				sharedInstance = getSingleton(beanName, () -> {
-					try {
-						return createBean(beanName, mbd, args);
-					}
-					catch (BeansException ex) {
-						// Explicitly remove instance from singleton cache: It might have been put there
-						// eagerly by the creation process, to allow for circular reference resolution.
-						// Also remove any beans that received a temporary reference to the bean.
-						destroySingleton(beanName);
-						throw ex;
-					}
-				});
-				bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
-			}
-
-			else if (mbd.isPrototype()) {
-				// It's a prototype -> create a new instance.
-				Object prototypeInstance = null;
-				try {
-					beforePrototypeCreation(beanName);
-					prototypeInstance = createBean(beanName, mbd, args);
-				}
-				finally {
-					afterPrototypeCreation(beanName);
-				}
-				bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
-			}
-
-			else {
-				String scopeName = mbd.getScope();
-				final Scope scope = this.scopes.get(scopeName);
-				if (scope == null) {
-					throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
-				}
-				try {
-					Object scopedInstance = scope.get(beanName, () -> {
-						beforePrototypeCreation(beanName);
-						try {
-							return createBean(beanName, mbd, args);
-						}
-						finally {
-							afterPrototypeCreation(beanName);
-						}
-					});
-					bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
-				}
-				catch (IllegalStateException ex) {
-					throw new BeanCreationException(beanName,
-							"Scope '" + scopeName + "' is not active for the current thread; consider " +
-							"defining a scoped proxy for this bean if you intend to refer to it from a singleton",
-							ex);
-				}
-			}
-		}
-		catch (BeansException ex) {
-			cleanupAfterBeanCreationFailure(beanName);
-			throw ex;
-		}
-	}
-
-	// Check if required type matches the type of the actual bean instance.
-	if (requiredType != null && !requiredType.isInstance(bean)) {
-		try {
-			T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
-			if (convertedBean == null) {
-				throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
-			}
-			return convertedBean;
-		}
-		catch (TypeMismatchException ex) {
+    //情况3的log
+		else {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Failed to convert bean '" + name + "' to required type '" +
-						ClassUtils.getQualifiedName(requiredType) + "'", ex);
+				logger.trace("Overriding bean definition for bean '" + beanName +
+						"' with an equivalent definition: replacing [" + existingDefinition +
+						"] with [" + beanDefinition + "]");
 			}
-			throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
 		}
+    // 覆盖BeanDefinition
+		this.beanDefinitionMap.put(beanName, beanDefinition);
 	}
-	return (T) bean;
+	else {
+    // 已经创建过Bean了，这个情况会把beanDefinitionNames，manualSingletonNames直接换一个list来保存所有BeanName,防止遍历报错
+		if (hasBeanCreationStarted()) {
+			synchronized (this.beanDefinitionMap) {
+				this.beanDefinitionMap.put(beanName, beanDefinition);
+				List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
+				updatedDefinitions.addAll(this.beanDefinitionNames);
+				updatedDefinitions.add(beanName);
+				this.beanDefinitionNames = updatedDefinitions;
+        //假如手动注册过这个beanName的singleton，把singleton移除
+				if (this.manualSingletonNames.contains(beanName)) {
+					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
+					updatedSingletons.remove(beanName);
+					this.manualSingletonNames = updatedSingletons;
+				}
+			}
+		}
+		else {
+			// 还在初始化阶段
+			this.beanDefinitionMap.put(beanName, beanDefinition);
+			this.beanDefinitionNames.add(beanName);
+			this.manualSingletonNames.remove(beanName);
+		}
+		this.frozenBeanDefinitionNames = null;
+	}
+
+	if (existingDefinition != null || containsSingleton(beanName)) {
+		resetBeanDefinition(beanName);
+	}
 }
 ```
+
+- beanDefinitionMap   ：保存了BeanName -> BeanDefinition的映射关系。
+- beanDefinitionName  ：保存了所有注册了的beanName。
+- manualSingletonNames：调用registerSingleton就会往这个map注册beanName -> singleton
+
+
+---

@@ -157,10 +157,13 @@ beanDefinition提供了很多get、set方法都是和可配置的参数一一对
 |primary|primary|设置为自动注入的首选项，当by type注入时，找到多个符合的类型，设primary为true优先注入（断路器作用，当by type查找，找到第一个primary为true的时候就会取这个bean为结果，结束查找）|
 |factoryBeanName|factory-bean|bean工厂|
 |factoryMethodName|factory-method|bean工厂方法|
-|initMethodName|init-method|初始化钩子函数|
-|destroyMethodName|destory-method|摧毁钩子函数|
+|initMethodName|init-method|初始化的钩子函数|
+|destroyMethodName|destory-method|摧毁的钩子函数|
 |abstract|abstract|默认false, true意味着这个bean只能被继承，不能实例化|
 |autowireMode(AbstractBeanDefinition)|default-autowire|设置自动注入模式，默认为NO|
+|qualifiers(AbstractBeanDefinition)|qualifier|标记, by type查到可以根据qualifier筛选一些bean|
+
+参数解释：
 
 ** role : **
 
@@ -176,6 +179,8 @@ Role这个属性是用来标记这个Bean是属于哪种，bean。
 
 ##### AbstractBeanDefinition
 
+参数解释：
+
 ** autowireMode: **
 
 设置了 autowireMode 的 bean 根据模式扫描 bean的set方法或 构造函数来自动注入。
@@ -187,4 +192,54 @@ Role这个属性是用来标记这个Bean是属于哪种，bean。
 
 ** methodOverride: **
 
-对spring管理的bean的方法进行重写
+对spring管理的bean的方法进行重写。 (配置replace-method或lookup-method会解析成methodOverride)
+
+//TODO
+涉及AOP，待续。。。
+
+方法：
+
+** validate: **
+
+```Java
+public void validate() throws BeanDefinitionValidationException {
+  // 如果有方法重写（需要代理）又是factory bean(无法代理)那就抛出异常
+	if (hasMethodOverrides() && getFactoryMethodName() != null) {
+		throw new BeanDefinitionValidationException(
+				"Cannot combine static factory method with method overrides: " +
+				"the static factory method must create the instance");
+	}
+
+	if (hasBeanClass()) {
+		prepareMethodOverrides();
+	}
+}
+
+public void prepareMethodOverrides() throws BeanDefinitionValidationException {
+	// Check that lookup methods exists.
+	if (hasMethodOverrides()) {
+		Set<MethodOverride> overrides = getMethodOverrides().getOverrides();
+		synchronized (overrides) {
+			for (MethodOverride mo : overrides) {
+				prepareMethodOverride(mo);
+			}
+		}
+	}
+}
+
+protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+	int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
+	if (count == 0) {
+		throw new BeanDefinitionValidationException(
+				"Invalid method override: no method with name '" + mo.getMethodName() +
+				"' on class [" + getBeanClassName() + "]");
+	}
+	else if (count == 1) {
+		mo.setOverloaded(false);
+	}
+}
+```
+
+这里校验的后续处理工作其实和前面的methodOverride机制有关。methodOverride需要去检查参数的问题，这就涉及到了方法重载。（待续。。。）
+
+** parent: **

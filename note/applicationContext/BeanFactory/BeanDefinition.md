@@ -242,4 +242,43 @@ protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionVal
 
 这里校验的后续处理工作其实和前面的methodOverride机制有关。methodOverride需要去检查参数的问题，这就涉及到了方法重载。（待续。。。）
 
-** parent: **
+##### 6、父子BeanDefinition
+
+Spring容器的Bean之间是可以有继承关系的。
+
+继承配置：
+
+```xml
+<bean id="parent" class="appcontext.parent.Parent">
+    <property name="name" value="parent"/>
+</bean>
+
+<bean id="son" class="appcontext.parent.Son" parent="parent"/>
+```
+```java
+public class Parent {
+    private String name;
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+public class Son {
+    private String name;
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+通过指定bean的parent这个参数，Son继承了所有Parent的所有配置。当然Son也可以覆盖parent的配置。通过这种方式可以把共用配置抽出来做成模板。
+
+其中Parent的class不可以不指定，然后把abstract属性设置为true，这样parent就相当于一个纯配置模板，不能被实例化。
+
+```xml
+<bean id="parent" abstract="true">
+    <property name="name" value="parent"/>
+</bean>
+```
+** RootBeanDefinition,ChildBefinition和GenericBeanDefinition **
+
+RootBeanDefinition,ChildBefinition和GenericBeanDefinition是AbstractBeanDefinition的3种实现。ChildDefinition必须指定其Parent，所以一般表示子BeanDefinition。但是在2.5之后一般都用通用的GenericBeanDefinition，因为GenericBeanDefinition更加灵活，可以随时指定不同的Parent。

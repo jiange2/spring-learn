@@ -33,7 +33,7 @@ Spring一般可以通过BeanName和Bean的type来获取bean。那Bean的Name是�
 
 ** BeanDefinition :**
 
-
+![BeanDefinition详情](/note/applicationContext/BeanFactory/BeanDefinition.md)
 
 ** BeanProvider :**
 
@@ -217,8 +217,6 @@ public String canonicalName(String name) {
 
 ** resolveAliases ：**
 
-
-
 ```java
 public void resolveAliases(StringValueResolver valueResolver) {
 	Assert.notNull(valueResolver, "StringValueResolver must not be null");
@@ -259,7 +257,7 @@ public void resolveAliases(StringValueResolver valueResolver) {
 
 ---
 
-### 5、BeanDefinition注册和获取
+### 5、BeanDefinitionRegistry
 
 ```Java
 public interface BeanDefinitionRegistry extends AliasRegistry {
@@ -286,99 +284,3 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 - BeanDefinitionRegistry提供了BeanDefinination的管理和访问方法。
 
 - BeanDefinitionRegistry继承了AliasRegistry,因为Alias其实也是BeanDefinition的一个特性。
-
-** 注册BeanDefinition: **
-
-DefaultListableBeanFactory的registerBeanDefinition实现：
-
-```java
-@Override
-public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-		throws BeanDefinitionStoreException {
-
-  Assert.hasText(beanName, "Bean name must not be empty");
-  Assert.notNull(beanDefinition, "BeanDefinition must not be null");
-
-  //校验BeanDefinition
-  if (beanDefinition instanceof AbstractBeanDefinition) {
-  	try {
-  		((AbstractBeanDefinition) beanDefinition).validate();
-  	}
-  	catch (BeanDefinitionValidationException ex) {
-  		throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
-  				"Validation of bean definition failed", ex);
-  	}
-  }
-
-	BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-  //该BeanName是否已经注册过BeanDefinition了
-	if (existingDefinition != null) {
-    //不允许覆盖
-		if (!isAllowBeanDefinitionOverriding()) {
-			throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
-		}
-    //情况1的log
-		else if (existingDefinition.getRole() < beanDefinition.getRole()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Overriding user-defined bean definition for bean '" + beanName +
-						"' with a framework-generated bean definition: replacing [" +
-						existingDefinition + "] with [" + beanDefinition + "]");
-			}
-		}
-    //情况2的log
-		else if (!beanDefinition.equals(existingDefinition)) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Overriding bean definition for bean '" + beanName +
-						"' with a different definition: replacing [" + existingDefinition +
-						"] with [" + beanDefinition + "]");
-			}
-		}
-    //情况3的log
-		else {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Overriding bean definition for bean '" + beanName +
-						"' with an equivalent definition: replacing [" + existingDefinition +
-						"] with [" + beanDefinition + "]");
-			}
-		}
-    // 覆盖BeanDefinition
-		this.beanDefinitionMap.put(beanName, beanDefinition);
-	}
-	else {
-    // 已经创建过Bean了，这个情况会把beanDefinitionNames，manualSingletonNames直接换一个list来保存所有BeanName,防止遍历报错
-		if (hasBeanCreationStarted()) {
-			synchronized (this.beanDefinitionMap) {
-				this.beanDefinitionMap.put(beanName, beanDefinition);
-				List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
-				updatedDefinitions.addAll(this.beanDefinitionNames);
-				updatedDefinitions.add(beanName);
-				this.beanDefinitionNames = updatedDefinitions;
-        //假如手动注册过这个beanName的singleton，把singleton移除
-				if (this.manualSingletonNames.contains(beanName)) {
-					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
-					updatedSingletons.remove(beanName);
-					this.manualSingletonNames = updatedSingletons;
-				}
-			}
-		}
-		else {
-			// 还在初始化阶段
-			this.beanDefinitionMap.put(beanName, beanDefinition);
-			this.beanDefinitionNames.add(beanName);
-			this.manualSingletonNames.remove(beanName);
-		}
-		this.frozenBeanDefinitionNames = null;
-	}
-
-	if (existingDefinition != null || containsSingleton(beanName)) {
-		resetBeanDefinition(beanName);
-	}
-}
-```
-
-- beanDefinitionMap   ：保存了BeanName -> BeanDefinition的映射关系。
-- beanDefinitionName  ：保存了所有注册了的beanName。
-- manualSingletonNames：调用registerSingleton就会往这个map注册beanName -> singleton
-
-
----

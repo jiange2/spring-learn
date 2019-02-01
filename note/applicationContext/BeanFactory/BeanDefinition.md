@@ -282,3 +282,5 @@ public class Son {
 ** RootBeanDefinition,ChildBefinition和GenericBeanDefinition **
 
 RootBeanDefinition,ChildBefinition和GenericBeanDefinition是AbstractBeanDefinition的3种实现。ChildDefinition必须指定其Parent，所以一般表示子BeanDefinition。但是在2.5之后一般都用通用的GenericBeanDefinition，因为GenericBeanDefinition更加灵活，可以随时指定不同的Parent。
+
+##### 7、BeanDefinition注册

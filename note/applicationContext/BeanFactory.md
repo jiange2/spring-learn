@@ -284,3 +284,5 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 - BeanDefinitionRegistry提供了BeanDefinination的管理和访问方法。
 
 - BeanDefinitionRegistry继承了AliasRegistry,因为Alias其实也是BeanDefinition的一个特性。
+
+#### 6、DefaultListableBeanFactory

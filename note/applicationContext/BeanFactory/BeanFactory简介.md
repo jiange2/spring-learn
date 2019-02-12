@@ -1,0 +1,3 @@
+## BeanFactroy简介
+
+---

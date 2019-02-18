@@ -2,14 +2,14 @@
 
 ---
 
-Spring一般可以通过BeanName和Bean的type来获取bean。那Bean的Name是根据我们配置决定的，主要是跟id和name这两个属性有关系。name的逻辑：
+Spring一般可以通过BeanName和Bean的type来获取bean。根据BeanName其实是根据name和alias获取bean。Bean的name和alias是根据我们配置决定的，主要是跟id和name这两个属性有关系。name和alias的逻辑：
  - 假如配置了id，BeanName就是id。
- - 同样，配置了name，那BeaName就是配置的name。
+ - 如果只配置了name，那BeaName就是配置的name。
  - 如果同时配置了id，那BeanName就是id，而配置的name就是Aliase。
  - 如果配置了多个name，会取首个name作为BeanName,其他是Aliase
  - 如果都没配的话就是`appcontext.(全限定类名)#0。`
 
-无论是BeanName或是Aliase都可以通过getBean(String name)的方式来获取bean。
+我们在获取spring的bean的时候，对于getBean(String name)这个方法，参数name既可以是name也可以是alias。
 
 ##### AliasRegistry:
 

@@ -8,4 +8,5 @@
 2. ![BeanDefinition](/note/applicationContext/BeanFactory/BeanDefinition.md)
 3. ![Alias](/note/applicationContext/BeanFactory/Alias.md)
 4. ![Singleton注册](/note/applicationContext/BeanFactory/Singleton/Singleton.md)
+5. ![FactoryBean](/note/applicationContext/BeanFactory/FactoryBean.md)
 5. temp

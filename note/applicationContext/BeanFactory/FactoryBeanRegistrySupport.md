@@ -26,4 +26,4 @@ factoryBeanObjectCache是用于存放FactoryBean单例的Map。
 |是否是单例|配置决定|由FactoryBean的isSingleton方法决定的|
 |单例存放点|DefaultSingletonBeanRegistry的SingletonObjects|FactoryBeanRegistrySupport的factoryBeanObjectCache|
 |创建方式|可以像普通Bean进行依赖注入|因为是通过getObject方法生成，无法直接注入依赖|
-|获取方法|需要在BeanName前加 '&'|直接用BeanName|
+|获取方法|需要在BeanName前加 '&' getBean("&" + BeanName)|直接用BeanName|
